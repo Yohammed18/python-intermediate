@@ -1,20 +1,27 @@
 # Example file showing a basic pygame "game loop"
 import pygame, random, math
-
-# pygame setup and initiliaze pygame
+from pygame import mixer
+# pygame setup and initiliaze pygame and backgourg music
 pygame.init()
+mixer.init()
 # Create the screen and set screen dimension
 screen = pygame.display.set_mode((800, 600))
 
 
 # set title and icon, load image for a window icon, store the image in to be displayed on the screen 
 pygame.display.set_caption('Space Invation')
-game_icon = pygame.image.load('rocket-ship.png')
+game_icon = pygame.image.load('img\\rocket-ship.png')
 pygame.display.set_icon(game_icon)
+
+
+# load the music for the background of the game
+mixer.music.load("sound\\background_space.mp3")
+mixer.music.set_volume(0.2)
+mixer.music.play(-1)
 
 # CREATE PLAYER FOR THE GAME
 # load image that will rapresent the player
-img_player = pygame.image.load('player_img.png')
+img_player = pygame.image.load('img\\player_img.png')
 
 # set hight/width so the img can render properly on the screen
 player_size = (75,75)
@@ -64,7 +71,7 @@ number_of_enemies = 8
 
 # create multiple enemies
 for e in range(number_of_enemies):
-    enemy = pygame.image.load('enemy_player.png')
+    enemy = pygame.image.load('img\\enemy_player.png')
     enemy = pygame.transform.scale(enemy, enemy_size)
     img_enemy.append(enemy)
     enemy_x.append(random.randint(0, 740))
@@ -104,11 +111,11 @@ def y_axis_restriction(p_y):
 #     return e_x_change, e_y
 
 # Let's load the background with an outerspace image:
-background_img = pygame.image.load('background_img.png')
+background_img = pygame.image.load('img\\background_img.png')
 background_img = pygame.transform.scale(background_img, (800,600))
 
 # let's load bullet img and set coordinates and rotate the image to face up
-img_bullet = pygame.image.load('bullet_img.png')
+img_bullet = pygame.image.load('img\\bullet_img.png')
 bullet_size = (10,5)
 img_bullet = pygame.transform.scale(img_bullet, bullet_size)
 img_bullet = pygame.transform.rotate(img_bullet, 90)
@@ -119,7 +126,7 @@ bullet_x = 0
 bullet_y = player_y
 
 bullet_x_change = 0
-bullet_y_change = 1 # bullet speed
+bullet_y_change = 1.7 # bullet speed
 visibile_bullet = False
 
 # create a function to handle the bullet visibility
@@ -145,6 +152,14 @@ is_running = True
 
 # Score variable
 score = 0
+my_font = pygame.font.Font('font\Montague.ttf',32)
+text_x = 10
+text_y = 10
+
+def show_score(x,y):
+    """show score on the screen"""
+    text = my_font.render(f'Score: {score}', True, (224,224,224))
+    screen.blit(text, (x,y))
 
 #  set game loop
 while is_running:
@@ -171,6 +186,9 @@ while is_running:
             elif event.key == pygame.K_DOWN:
                 player_y_change = 0.3
             elif event.key == pygame.K_SPACE:
+                bullet_sound = mixer.Sound('sound\\space_missile.mp3')
+                bullet_sound.set_volume(.2)
+                bullet_sound.play()
                 if not visibile_bullet:
                     bullet_x = player_x
                     bullet_y = player_y 
@@ -213,10 +231,12 @@ while is_running:
         is_collision = is_there_collision(enemy_x[enem], enemy_y[enem], bullet_x, bullet_y)
 
         if is_collision:
+            collision_sound = mixer.Sound('sound\\enemy_destroyed.mp3')
+            collision_sound.set_volume(.7)
+            collision_sound.play()
             bullet_y = player_y
             visibile_bullet = False
             score+= 1
-            print(score)
             # set the enemy coordinate to re-appear else where when it hits
             enemy_x[enem] = random.randint(0, 740)
             enemy_y[enem] = random.randint(0, 200)
@@ -237,6 +257,8 @@ while is_running:
         """
         shoot_bullet(bullet_x, bullet_y)
         bullet_y -= bullet_y_change
+
+    show_score(text_x, text_y)
 
     # update the screen properly
     pygame.display.update()
