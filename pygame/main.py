@@ -1,5 +1,5 @@
 # Example file showing a basic pygame "game loop"
-import pygame
+import pygame, random
 
 # pygame setup and initiliaze pygame
 pygame.init()
@@ -7,34 +7,55 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 
 
-# set title and icon
-pygame.display.set_caption('Space Invation.')
-# load image for a window icon
-icon_image = pygame.image.load('rocket-ship.png')
-# store the image in the set icon method
-pygame.display.set_icon(icon_image)
+# set title and icon, load image for a window icon, store the image in to be displayed on the screen 
+pygame.display.set_caption('Space Invation')
+game_icon = pygame.image.load('rocket-ship.png')
+pygame.display.set_icon(game_icon)
 
 # CREATE PLAYER FOR THE GAME
 # load image that will rapresent the player
 img_player = pygame.image.load('player_img.png')
 
-# since the image of the icon is extremely large we are going to chage its dimension
-new_size = (75,75)
-img_player = pygame.transform.scale(img_player, new_size)
+# set hight/width so the img can render properly on the screen
+player_size = (75,75)
+img_player = pygame.transform.scale(img_player, player_size)
 
 # when setting coordinate always remmber The (0, 0) coordinates represent the top-left corner of the surface.
-# establish the x, y coordinate that will move the plyaer around
-# player starting point position.
+# player coordinate starting position
 player_x = 362.5
 player_y = 525
+
 # keep track of the player movements once the key are pressed
 player_x_change = 0
 player_y_change = 0
 
-# create function that will display player position
-def player(x, y):
+def player_position(x, y):
+    """This method will take the x and y axis the coordinates and display the player position on the screen
+    """
     screen.blit(img_player, (x , y))
 
+# CREATE ENEMY
+
+# upload image
+img_enemy = pygame.image.load('enemy_player.png')
+# allocate width and height 
+enemy_size = (75,75)
+# assign the dimension to the enemy img
+img_enemy = pygame.transform.scale(img_enemy, enemy_size)
+# In case you habe an image that is not facing the player go ahead and use the pygame rotate function to 180
+# img_enemy = pygame.transform.rotate(img_enemy, 180)
+# set the base coordinates for the enemy player
+# enemy_x = 362.5
+# enemy_y = 0
+
+# set the enemy position in a random spot
+enemy_x = random.randint(0, 725)
+enemy_y = random.randint(0, 200)
+
+def enemy_position(x,y):
+    """This method will take the x and y axis the coordinates and display the enemy position on the screen
+    """
+    screen.blit(img_enemy, (x,y))
 
 
 
@@ -80,7 +101,7 @@ while is_running:
     # all the update within the game must be done insided of the while loop
     # You will use rgb colors numbers to set the background of the screen, however you can also just name the color and pass it as a string
     background_color = "violet"
-    background_rgb = (64, 224, 208) # Turquoise
+    background_rgb = (229, 204, 255) # Turquoise
     screen.fill(background_rgb)
     # value that will move the player up or down depending on which axis you're manipulating with
     # player_x += 0.1
@@ -103,8 +124,9 @@ while is_running:
         player_y = 525
 
     
-    # update the player position in the while loop
-    player(player_x, player_y)
+    # update the player/enemy position in the while loop
+    player_position(player_x, player_y)
+    enemy_position(enemy_x, enemy_y)
 
     # update the screen properly
     pygame.display.update()
