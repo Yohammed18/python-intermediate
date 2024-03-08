@@ -1,5 +1,5 @@
 # Example file showing a basic pygame "game loop"
-import pygame, random
+import pygame, random, math
 
 # pygame setup and initiliaze pygame
 pygame.init()
@@ -36,29 +36,46 @@ def player_position(x, y):
 
 # CREATE ENEMY
 
+# # upload image
+# img_enemy = pygame.image.load('enemy_player.png')
+# # allocate width and height 
+# enemy_size = (60,60)
+# # assign the dimension to the enemy img
+# img_enemy = pygame.transform.scale(img_enemy, enemy_size)
+# # set the enemy position in a random spot
+# enemy_x = random.randint(0, 740)
+# enemy_y = random.randint(0, 200)
+# enemy_x_change = 0.5
+# enemy_y_change = 50
+
+
+# BUILD MULTIPLE ENEMIES 
 # upload image
-img_enemy = pygame.image.load('enemy_player.png')
+img_enemy = []
 # allocate width and height 
 enemy_size = (60,60)
-# assign the dimension to the enemy img
-img_enemy = pygame.transform.scale(img_enemy, enemy_size)
-# In case you habe an image that is not facing the player go ahead and use the pygame rotate function to 180
-# img_enemy = pygame.transform.rotate(img_enemy, 180)
-# set the base coordinates for the enemy player
-# enemy_x = 362.5
-# enemy_y = 0
 
 # set the enemy position in a random spot
-enemy_x = random.randint(0, 740)
-enemy_y = random.randint(0, 200)
-enemy_x_change = 0.15
-enemy_y_change = 50
+enemy_x = []
+enemy_y = []
+enemy_x_change = []
+enemy_y_change = []
+number_of_enemies = 8
 
-def enemy_position(x,y):
+# create multiple enemies
+for e in range(number_of_enemies):
+    enemy = pygame.image.load('enemy_player.png')
+    enemy = pygame.transform.scale(enemy, enemy_size)
+    img_enemy.append(enemy)
+    enemy_x.append(random.randint(0, 740))
+    enemy_y.append(random.randint(0, 200))
+    enemy_x_change.append(0.5)
+    enemy_y_change.append(50)
+
+def enemy_position(x,y, en):
     """This method will take the x and y axis the coordinates and display the enemy position on the screen
     """
-    screen.blit(img_enemy, (x,y))
-
+    screen.blit(img_enemy[en], (x,y))
 
 # functions to handle screen restrictions
 def x_axis_restriction(p_x):
@@ -111,8 +128,23 @@ def shoot_bullet(x, y):
     visibile_bullet = True
     screen.blit(img_bullet, (x+35,y+10))
 
+# calculate colision in gaming  
+    # d= srt(x2−x1)^2 + (y2−y1)^2
+def is_there_collision(x_1, y_1, x_2, y_2):
+    """function utilized to detect if there is collision in the game """
+    distance = math.sqrt(math.pow(x_1 - x_2, 2)+ math.pow(y_1 - y_2, 2))
+
+    if distance < 27:
+        return True
+    else:
+        False
+
+
 # variable that will dictate the while loop condition
 is_running = True
+
+# Score variable
+score = 0
 
 #  set game loop
 while is_running:
@@ -152,15 +184,10 @@ while is_running:
                 player_y_change = 0 
 
 
-
-    # all the update within the game must be done insided of the while loop
     # You will use rgb colors numbers to set the background of the screen, however you can also just name the color and pass it as a string
     background_color = "violet"
     background_rgb = (229, 204, 255) # Turquoise
     # screen.fill(background_rgb)
-    # value that will move the player up or down depending on which axis you're manipulating with
-    # player_x += 0.1
-    # player_y -= 0.1
     screen.blit(background_img, (0,0))
 
     # modify player position based on keys being pressed
@@ -171,20 +198,35 @@ while is_running:
     player_x = x_axis_restriction(player_x)
     player_y = y_axis_restriction(player_y)
 
+     # Modify enemy location
+    for enem in range(number_of_enemies):
+        enemy_x[enem]+= enemy_x_change[enem]
+        # set enemy position
+        # enemy_x_change, enemy_y = x_axis_enemy_movement(enemy_x, enemy_x_change, enemy_y, enemy_x_change)
+        if enemy_x[enem] <= 0:
+            enemy_x_change[enem] = 0.15
+            enemy_y[enem] += enemy_y_change[enem]
+        elif enemy_x[enem] >= 740:
+            enemy_x_change[enem] = -0.15
+            enemy_y[enem] += enemy_y_change[enem]
+
+        is_collision = is_there_collision(enemy_x[enem], enemy_y[enem], bullet_x, bullet_y)
+
+        if is_collision:
+            bullet_y = player_y
+            visibile_bullet = False
+            score+= 1
+            print(score)
+            # set the enemy coordinate to re-appear else where when it hits
+            enemy_x[enem] = random.randint(0, 740)
+            enemy_y[enem] = random.randint(0, 200)
+        
+        enemy_position(enemy_x[enem], enemy_y[enem], enem)
+
+    
     # update the player/enemy position in the while loop
     player_position(player_x, player_y)
-    enemy_position(enemy_x, enemy_y)
 
-     # Modify enemy location
-    enemy_x += enemy_x_change
-    # set enemy position
-    # enemy_x_change, enemy_y = x_axis_enemy_movement(enemy_x, enemy_x_change, enemy_y, enemy_x_change)
-    if enemy_x <= 0:
-        enemy_x_change = 0.15
-        enemy_y += enemy_y_change
-    elif enemy_x >= 740:
-        enemy_x_change = -0.15
-        enemy_y += enemy_y_change
 
     # bullet movement
     if bullet_y <= -10 or not visibile_bullet:
