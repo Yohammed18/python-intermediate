@@ -88,8 +88,28 @@ def y_axis_restriction(p_y):
 
 # Let's load the background with an outerspace image:
 background_img = pygame.image.load('background_img.png')
-
 background_img = pygame.transform.scale(background_img, (800,600))
+
+# let's load bullet img and set coordinates and rotate the image to face up
+img_bullet = pygame.image.load('bullet_img.png')
+bullet_size = (10,5)
+img_bullet = pygame.transform.scale(img_bullet, bullet_size)
+img_bullet = pygame.transform.rotate(img_bullet, 90)
+# img_bullet = pygame.transform.scale(img_bullet, (10,10))
+
+# bullet variables
+bullet_x = 0
+bullet_y = player_y
+
+bullet_x_change = 0
+bullet_y_change = 1 # bullet speed
+visibile_bullet = False
+
+# create a function to handle the bullet visibility
+def shoot_bullet(x, y):
+    global visibile_bullet
+    visibile_bullet = True
+    screen.blit(img_bullet, (x+35,y+10))
 
 # variable that will dictate the while loop condition
 is_running = True
@@ -106,7 +126,7 @@ while is_running:
         # Controlling the direction of the rocket with our key board
         # remeber everything is an event and we will program as such
         
-        # press arrow key event 
+        # press key event 
         if event.type == pygame.KEYDOWN:
             # handles the x-axis movements 
             if event.key == pygame.K_LEFT:
@@ -118,15 +138,18 @@ while is_running:
                 player_y_change = -0.3
             elif event.key == pygame.K_DOWN:
                 player_y_change = 0.3
-
-    
+            elif event.key == pygame.K_SPACE:
+                if not visibile_bullet:
+                    bullet_x = player_x
+                    bullet_y = player_y 
+                    shoot_bullet(bullet_x, bullet_y)
         
         # release key event
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 player_x_change = 0
             elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                player_y_change = 0
+                player_y_change = 0 
 
 
 
@@ -148,11 +171,14 @@ while is_running:
     player_x = x_axis_restriction(player_x)
     player_y = y_axis_restriction(player_y)
 
-    # Modify enemy location
+    # update the player/enemy position in the while loop
+    player_position(player_x, player_y)
+    enemy_position(enemy_x, enemy_y)
+
+     # Modify enemy location
     enemy_x += enemy_x_change
     # set enemy position
     # enemy_x_change, enemy_y = x_axis_enemy_movement(enemy_x, enemy_x_change, enemy_y, enemy_x_change)
-    
     if enemy_x <= 0:
         enemy_x_change = 0.15
         enemy_y += enemy_y_change
@@ -160,9 +186,15 @@ while is_running:
         enemy_x_change = -0.15
         enemy_y += enemy_y_change
 
-    # update the player/enemy position in the while loop
-    player_position(player_x, player_y)
-    enemy_position(enemy_x, enemy_y)
+    # bullet movement
+    if bullet_y <= -10 or not visibile_bullet:
+        visibile_bullet = False
+        
+    if visibile_bullet:
+        """In this modification, the bullet's position is updated independently based on its own bullet_y coordinate. This should prevent the bullet from following the player after it's fired.
+        """
+        shoot_bullet(bullet_x, bullet_y)
+        bullet_y -= bullet_y_change
 
     # update the screen properly
     pygame.display.update()
