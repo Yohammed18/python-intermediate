@@ -152,7 +152,7 @@ is_running = True
 
 # Score variable
 score = 0
-my_font = pygame.font.Font('font\Montague.ttf',32)
+my_font = pygame.font.Font('font\Montague.ttf',40)
 text_x = 10
 text_y = 10
 
@@ -160,6 +160,16 @@ def show_score(x,y):
     """show score on the screen"""
     text = my_font.render(f'Score: {score}', True, (224,224,224))
     screen.blit(text, (x,y))
+
+# end of game text
+end_font = pygame.font.Font('font\Broad_Casting.ttf', 80)
+
+def final_text():
+    my_final_font = end_font.render('GAME OVER', True, (255,255,255))
+    screen.blit(my_final_font, (200,200))
+
+
+
 
 #  set game loop
 while is_running:
@@ -218,6 +228,14 @@ while is_running:
 
      # Modify enemy location
     for enem in range(number_of_enemies):
+        # end of game
+        if enemy_y[enem] > 500:
+            for k in range(number_of_enemies):
+                enemy_y[k] = 1000
+            
+            final_text()
+            break
+
         enemy_x[enem]+= enemy_x_change[enem]
         # set enemy position
         # enemy_x_change, enemy_y = x_axis_enemy_movement(enemy_x, enemy_x_change, enemy_y, enemy_x_change)
