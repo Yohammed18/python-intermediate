@@ -1,3 +1,9 @@
 Use 'https://books.toscrape.com/' to conduct the web scrapping exercise for this project
 
 Has web scrapper we are going to find a way to retrieve the title of all the books who have 5 stars rating. 
+
+Here is the flow of web scrapping for this exercise.
+
+1. establish how many pages will need to be scrapped to find all the books have a 5 star rating
+
+1. identify the key element that defines weather a book is of a 5 start rating i.e. all the books class are of type "star-rating Five"

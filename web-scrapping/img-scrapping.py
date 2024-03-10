@@ -17,7 +17,7 @@ images = soup.select('.img-responsive')[0]['src']
 
 print(images)
 
-image1 = requests.get(images)
+image1 = requests.get('images')
 # wb stand for write binary
 f = open('my_image.jpg', 'wb')
 f.write(image1.content)
