@@ -27,6 +27,7 @@ Developing Gaming, AI, Graph, Data migration, Web Development, etc via Python/Dj
         - Authentication
         - Proxy Rotation
 - Programming a management system
+    - For this segment we are going to utilize the Python module TKinter. To learn more about this amazing GUI (Grapihcal User Interface) visit the Doc page https://docs.python.org/3/library/tk.html
 - Programming Ai via voice
 - Programing machine learning model
 - Build web application via Django
