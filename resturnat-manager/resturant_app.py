@@ -1,13 +1,195 @@
 from tkinter import *
+import random
+import datetime
+from tkinter import filedialog, messagebox
 
 
 operator = ''
+food_prices = [2.50, 2.25, 2.99, 2.75, 1.99, 2.50, 2.25, 2.75]
+drink_prices = [1.50, 0.99, 1.75, 1.50, 1.75, 1.25, 2.50, 1.25]
+dessert_prices = [1.50, 1.60, 1.70, 1.80, 2.90, 2.55, 1.95, 1.75]
+
 
 def click_button(character):
     global operator
     operator = operator+character
     calculator_display.delete(0,END)
     calculator_display.insert(END, operator)
+
+def delete_all():
+    global operator
+    operator = ''
+    calculator_display.delete(0, END)
+
+def get_result():
+    global operator
+    result = str(eval(operator))
+    calculator_display.delete(0,END)
+    calculator_display.insert(0, result)
+    operator = ''
+
+def review_check():
+    x = 0
+    # food
+    for _ in food_box:
+        if food_variables[x].get() == 1:
+            food_box[x].config(state=NORMAL)
+            if food_box[x].get() == '0':
+                food_box[x].delete(0, END)
+            food_box[x].focus()
+        else:
+            food_box[x].config(state=DISABLED)
+            food_text[x].set('0') 
+        x+=1
+    # drinks
+    x = 0
+    for _ in drink_box:
+        if drink_variables[x].get() == 1:
+            drink_box[x].config(state=NORMAL)
+            if drink_box[x].get() == '0':
+                drink_box[x].delete(0, END)
+            drink_box[x].focus()
+        else:
+            drink_box[x].config(state=DISABLED)
+            drink_text[x].set('0') 
+        x+=1
+    # dessert
+    x = 0
+    for _ in dessert_box:
+        if dessert_variables[x].get() == 1:
+            dessert_box[x].config(state=NORMAL)
+            if dessert_box[x].get() == '0':
+                dessert_box[x].delete(0, END)
+            dessert_box[x].focus()
+        else:
+            dessert_box[x].config(state=DISABLED)
+            dessert_text[x].set('0') 
+        x+=1
+
+def total_calculation():
+    food_subtotal = 0
+    drink_subtotal = 0
+    dessert_subtotal = 0
+    
+    p = 0
+    # food
+    for unit in food_text:
+        food_subtotal = food_subtotal + (food_prices[p] * float(unit.get()))
+        p+=1
+    
+    # drink
+    # reset counter for every loop
+    p = 0
+    for unit in drink_text:
+        drink_subtotal = drink_subtotal + (drink_prices[p] * float(unit.get()))
+        p+=1
+
+    # dessert
+    # reset counter for every loop
+    p = 0
+    for unit in dessert_text:
+        dessert_subtotal = dessert_subtotal + (dessert_prices[p] * float(unit.get()))
+        p+=1   
+
+    total_subtotal = food_subtotal+drink_subtotal+dessert_subtotal
+    taxes = total_subtotal * 0.11
+    total = total_subtotal + taxes
+
+
+    # display all value tot he cost panel
+    food_cost_var.set(f'$ {round(food_subtotal, 2)}')
+    drink_cost_var.set(f'$ {round(drink_subtotal, 2)}')
+    dessert_cost_var.set(f'$ {round(dessert_subtotal, 2)}')
+    subtotal_var.set(f'$ {round(total_subtotal, 2)}')
+    taxes_var.set(f'$ {round(taxes, 2)}')
+    total_var.set(f'$ {round(total, 2)}')
+
+def create_invoice():
+    
+    invoice_text.delete(1.0, END)
+
+    invoice_number = f'N# - {random.randint(1000,9999)}'
+    current_date = datetime.datetime.now()
+
+    invoice_date = f'{current_date.month}/{current_date.day}/{current_date.year} - {current_date.hour:{current_date.minute}}'
+
+    invoice_text.insert(END, f'Information: \t{invoice_number}\t\t{invoice_date}\n')
+    invoice_text.insert(END, f'*'*66+'\n')
+    invoice_text.insert(END, f'Items\t\tQuantity\tItems Cost\n')
+    invoice_text.insert(END, f'-'*77+'\n')
+
+    x = 0
+    for f in food_text:
+        if f.get() != '0':
+            invoice_text.insert(END, f'{food_list[x]}\t\t{f.get()}\t$ {int(f.get()) * food_prices[x]}\n')
+        x+=1
+
+    x = 0
+    for d in drink_text:
+        if f.get() != '0':
+            invoice_text.insert(END, f'{drink_list[d]}\t\t{f.get()}\t$ {int(f.get()) * drink_prices[d]}\n')
+        x+=1
+
+    x = 0
+    for e in dessert_text:
+        if f.get() != '0':
+            invoice_text.insert(END, f'{dessert_list[e]}\t\t{f.get()}\t$ {int(f.get()) * dessert_prices[e]}\n')
+        x+=1
+
+    invoice_text.insert(END, f'-'*66+'\n')
+    invoice_text.insert(END, f'Food Subtotal: \t\t\t{food_cost_var.get()}\n')
+    invoice_text.insert(END, f'Drink Subtotal: \t\t\t{drink_cost_var.get()}\n')
+    invoice_text.insert(END, f'Dessert Subtotal: \t\t\t{dessert_cost_var.get()}\n')
+    invoice_text.insert(END, f'*'*77+'\n')
+    invoice_text.insert(END, f'Subtotal: \t\t\t{subtotal_var.get()}\n')
+    invoice_text.insert(END, f'Taxes: \t\t\t{taxes_var.get()}\n')
+    invoice_text.insert(END, f'Total: \t\t\t{total_var.get()}\n')
+    invoice_text.insert(END, f'-'*66+'\n')
+    invoice_text.insert(END, f'See you next time.')
+
+def save_invoice():
+    invoice_info = invoice_text.get(1.0, END)
+    file = filedialog.asksaveasfile(mode='w', defaultextension='.txt')
+    file.write(invoice_info)
+    file.close()
+    messagebox.showinfo('Notification', 'Your invoice has been saved')
+
+def total_reset():
+    invoice_text.delete(0.1, END)
+
+    for text in food_text:
+        text.set('0')
+
+    for text in drink_text:
+        text.set('0')
+
+    for text in dessert_text:
+        text.set('0')
+
+
+    for box in food_box:
+        box.config(state=DISABLED)
+     
+    for box in drink_box:
+        box.config(state=DISABLED)
+
+    for box in dessert_box:
+        box.config(state=DISABLED)
+
+    for var in food_variables:
+        var.set(0)
+    for var in drink_variables:
+        var.set(0)
+    for var in dessert_variables:
+        var.set(0)
+
+    food_cost_var.set('')
+    drink_cost_var.set('')
+    dessert_cost_var.set('')
+    taxes_var.set('')
+    subtotal_var.set('')
+    total_var.set('')
+
 
 
 # initiliaze TKinter
@@ -92,7 +274,11 @@ for food in food_list:
     food = Checkbutton(food_panel, 
                        text=food.title(), 
                        font=('book antiqua', 19, 'bold'), 
-                       onvalue=1, offvalue=0, variable=food_variables[counter])
+                       onvalue=1, 
+                       offvalue=0, 
+                       variable=food_variables[counter],
+                       command=review_check
+                       )
 
     food.grid(row=counter, 
               column=0, 
@@ -131,7 +317,8 @@ for drink in drink_list:
                         text=drink.title(), 
                         font=('book antiqua', 19, 'bold'), onvalue=1, 
                         offvalue=0, 
-                        variable=drink_variables[counter])
+                        variable=drink_variables[counter],
+                        command=review_check)
 
     drink.grid(row=counter, 
                column=1, 
@@ -169,7 +356,8 @@ for dessert in dessert_list:
                           text=dessert.title(), 
                           font=('book antiqua', 19, 'bold'), onvalue=1, 
                           offvalue=0, 
-                          variable=dessert_variables[counter])
+                          variable=dessert_variables[counter],
+                          command=review_check)
     # place properly in the colum and row
     dessert.grid(row=counter, 
                  column=2, 
@@ -199,6 +387,7 @@ for dessert in dessert_list:
 food_cost_var = StringVar()
 drink_cost_var = StringVar()
 dessert_cost_var = StringVar()
+
 subtotal_var = StringVar()
 taxes_var = StringVar()
 total_var = StringVar()
@@ -299,9 +488,8 @@ total_text.grid(row=2, column=3)
 
 # Buttons
 buttons = ['total', 'invoice', 'save', 'reset']
-
+created_buttons = []
 colum = 0
-
 for button in buttons:
     button = Button(
         button_panel,
@@ -312,10 +500,17 @@ for button in buttons:
         bd=1,
         width=9
     )
-
+    created_buttons.append(button)
     button.grid(row=0,
                 column= colum)
     colum += 1
+
+
+created_buttons[0].config(command=total_calculation)
+created_buttons[1].config(command=create_invoice)
+created_buttons[2].config(command=save_invoice)
+created_buttons[3].config(command=total_reset)
+
 
 # Invoice
 invoice_text = Text(invoice_panel,
@@ -341,7 +536,7 @@ calculator_display.grid(row=0,
 # createa loop that will place each element in the calculator display
 calculator_buttons = ['7', '8', '9', '+',
                       '4', '5', '6', '-',
-                      '1', '2', '3', 'x',
+                      '1', '2', '3', '*',
                       'CE', 'Delete', '0', '/',
                       ]
 
@@ -374,13 +569,14 @@ for button in calculator_buttons:
 
 
 for index in range(0,16):
-    if calculator_buttons[index] == 'CE' or calculator_buttons[index] == 'Delete':
-        index+=1
+    if calculator_buttons[index] == 'Delete':
+        stored_buttons[index].config(command=delete_all)
+    elif calculator_buttons[index] == 'CE':
+        stored_buttons[index].config(command=get_result)
     else:
         cal_val = calculator_buttons[index]
         stored_buttons[index].config(command=lambda char=cal_val: click_button(char))
         
-
 
 
 
