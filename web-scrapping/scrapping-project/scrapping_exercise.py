@@ -12,7 +12,7 @@ basic_url = 'https://books.toscrape.com/catalogue/page-{}.html'
 high_rated_titles = []
 
 
-for i in range(1, 5):
+for i in range(1, 3):
     # asign the url that will be scrapped
     url = 'https://books.toscrape.com/catalogue/page-{}.html'.format(i)
 
